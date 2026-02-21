@@ -4,39 +4,26 @@ function normalizeGoalInput(goal) {
   return {
     title: goal.title.trim(),
     successCriteria: goal.successCriteria.trim(),
-    notes: goal.notes.trim(),
-    deadline: goal.deadline,
   };
 }
 
-export default function GoalsStep({
-  goals,
-  onAddGoal,
-  onUpdateGoal,
-  onDeleteGoal,
-}) {
+export default function GoalsStep({ goals, onAddGoal, onUpdateGoal, onDeleteGoal }) {
   const [newGoal, setNewGoal] = useState({
     title: "",
     successCriteria: "",
-    notes: "",
-    deadline: "",
   });
   const [editingGoalId, setEditingGoalId] = useState(null);
   const [editingGoal, setEditingGoal] = useState({
     title: "",
     successCriteria: "",
-    notes: "",
-    deadline: "",
   });
   const [showNewGoalError, setShowNewGoalError] = useState(false);
 
   const isNewGoalValid =
-    newGoal.title.trim().length > 0 &&
-    newGoal.successCriteria.trim().length > 0;
+    newGoal.title.trim().length > 0 && newGoal.successCriteria.trim().length > 0;
 
   const isEditingGoalValid =
-    editingGoal.title.trim().length > 0 &&
-    editingGoal.successCriteria.trim().length > 0;
+    editingGoal.title.trim().length > 0 && editingGoal.successCriteria.trim().length > 0;
 
   const handleAddGoal = (event) => {
     event.preventDefault();
@@ -47,7 +34,7 @@ export default function GoalsStep({
     }
 
     onAddGoal(normalizeGoalInput(newGoal));
-    setNewGoal({ title: "", successCriteria: "", notes: "", deadline: "" });
+    setNewGoal({ title: "", successCriteria: "" });
     setShowNewGoalError(false);
   };
 
@@ -56,14 +43,12 @@ export default function GoalsStep({
     setEditingGoal({
       title: goal.title,
       successCriteria: goal.successCriteria,
-      notes: goal.notes ?? "",
-      deadline: goal.deadline ?? "",
     });
   };
 
   const cancelEditing = () => {
     setEditingGoalId(null);
-    setEditingGoal({ title: "", successCriteria: "", notes: "", deadline: "" });
+    setEditingGoal({ title: "", successCriteria: "" });
   };
 
   const saveEditing = (goalId) => {
@@ -82,16 +67,10 @@ export default function GoalsStep({
         Define outcomes. Tasks will be generated from these goals.
       </p>
 
-      <form
-        onSubmit={handleAddGoal}
-        className="mt-4 rounded-xl border border-slate-200 bg-white/80 p-4"
-      >
+      <form onSubmit={handleAddGoal} className="mt-4 rounded-xl border border-slate-200 bg-white/80 p-4">
         <div className="space-y-3">
           <div>
-            <label
-              htmlFor="goal-title"
-              className="mb-1 block text-xs font-medium text-slate-700"
-            >
+            <label htmlFor="goal-title" className="mb-1 block text-xs font-medium text-slate-700">
               Goal title
             </label>
             <input
@@ -99,10 +78,7 @@ export default function GoalsStep({
               type="text"
               value={newGoal.title}
               onChange={(event) =>
-                setNewGoal((previous) => ({
-                  ...previous,
-                  title: event.target.value,
-                }))
+                setNewGoal((previous) => ({ ...previous, title: event.target.value }))
               }
               className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
               placeholder="Launch MVP onboarding flow"
@@ -129,48 +105,6 @@ export default function GoalsStep({
               className="min-h-24 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
               placeholder="Users can create a board and add 3 tasks in under 2 minutes."
               required
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="goal-notes"
-              className="mb-1 block text-xs font-medium text-slate-700"
-            >
-              Notes (optional)
-            </label>
-            <textarea
-              id="goal-notes"
-              value={newGoal.notes}
-              onChange={(event) =>
-                setNewGoal((previous) => ({
-                  ...previous,
-                  notes: event.target.value,
-                }))
-              }
-              className="min-h-20 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
-              placeholder="Keep scope tight for demo day."
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="goal-deadline"
-              className="mb-1 block text-xs font-medium text-slate-700"
-            >
-              Deadline (optional)
-            </label>
-            <input
-              id="goal-deadline"
-              type="date"
-              value={newGoal.deadline}
-              onChange={(event) =>
-                setNewGoal((previous) => ({
-                  ...previous,
-                  deadline: event.target.value,
-                }))
-              }
-              className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
             />
           </div>
         </div>
@@ -200,10 +134,7 @@ export default function GoalsStep({
 
             if (isEditing) {
               return (
-                <div
-                  key={goal.id}
-                  className="rounded-xl border border-slate-300 bg-white p-4"
-                >
+                <div key={goal.id} className="rounded-xl border border-slate-300 bg-white p-4">
                   <div className="space-y-3">
                     <div>
                       <label
@@ -247,47 +178,6 @@ export default function GoalsStep({
                         required
                       />
                     </div>
-
-                    <div>
-                      <label
-                        htmlFor={`edit-notes-${goal.id}`}
-                        className="mb-1 block text-xs font-medium text-slate-700"
-                      >
-                        Notes (optional)
-                      </label>
-                      <textarea
-                        id={`edit-notes-${goal.id}`}
-                        value={editingGoal.notes}
-                        onChange={(event) =>
-                          setEditingGoal((previous) => ({
-                            ...previous,
-                            notes: event.target.value,
-                          }))
-                        }
-                        className="min-h-16 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
-                      />
-                    </div>
-
-                    <div>
-                      <label
-                        htmlFor={`edit-deadline-${goal.id}`}
-                        className="mb-1 block text-xs font-medium text-slate-700"
-                      >
-                        Deadline (optional)
-                      </label>
-                      <input
-                        id={`edit-deadline-${goal.id}`}
-                        type="date"
-                        value={editingGoal.deadline}
-                        onChange={(event) =>
-                          setEditingGoal((previous) => ({
-                            ...previous,
-                            deadline: event.target.value,
-                          }))
-                        }
-                        className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
-                      />
-                    </div>
                   </div>
 
                   <div className="mt-4 flex gap-2">
@@ -316,30 +206,10 @@ export default function GoalsStep({
             }
 
             return (
-              <div
-                key={goal.id}
-                className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="text-sm font-semibold text-slate-900">
-                      {goal.title}
-                    </p>
-                    <p className="mt-1 text-sm text-slate-600">
-                      {goal.successCriteria}
-                    </p>
-                    {goal.notes ? (
-                      <p className="mt-2 text-xs text-slate-500">
-                        {goal.notes}
-                      </p>
-                    ) : null}
-                  </div>
-
-                  {goal.deadline ? (
-                    <span className="rounded-full border border-slate-300 bg-slate-50 px-2 py-1 text-xs font-medium text-slate-700">
-                      {goal.deadline}
-                    </span>
-                  ) : null}
+              <div key={goal.id} className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                <div>
+                  <p className="text-sm font-semibold text-slate-900">{goal.title}</p>
+                  <p className="mt-1 text-sm text-slate-600">{goal.successCriteria}</p>
                 </div>
 
                 <div className="mt-3 flex gap-2">
