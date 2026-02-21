@@ -1,0 +1,4 @@
+# Create .gitkeep files in empty directories
+touch api/.gitkeep
+touch shared/.gitkeep
+touch web/.gitkeep
