@@ -1,37 +1,19 @@
-const DEFAULT_STEPS = [
-  {
-    id: 1,
-    name: "Goals",
-    status: "active",
-    activeClasses: "border-amber-300 bg-amber-100 shadow-sm",
-  },
-  {
-    id: 2,
-    name: "Constraints",
-    status: "incomplete",
-    activeClasses: "border-sky-300 bg-sky-100 shadow-sm",
-  },
-  {
-    id: 3,
-    name: "Context",
-    status: "incomplete",
-    activeClasses: "border-violet-300 bg-violet-100 shadow-sm",
-  },
-  {
-    id: 4,
-    name: "Guardrails",
-    status: "incomplete",
-    activeClasses: "border-rose-300 bg-rose-100 shadow-sm",
-  },
-];
+export default function Stepper({ steps, activeStepId, onSelectStep }) {
+  const activeStepClasses = {
+    1: "border-amber-300 bg-amber-100 shadow-sm",
+    2: "border-sky-300 bg-sky-100 shadow-sm",
+    3: "border-violet-300 bg-violet-100 shadow-sm",
+    4: "border-rose-300 bg-rose-100 shadow-sm",
+  };
 
-export default function Stepper({ steps = DEFAULT_STEPS, activeStepId = 1 }) {
   return (
     <ol className="space-y-3" aria-label="Project setup steps">
       {steps.map((step) => {
-        const isActive = step.id === activeStepId;
+        const isActive = step.status === "active";
         const isComplete = step.status === "complete";
-        const badgeText = isComplete ? "Complete" : isActive ? "Active" : "Incomplete";
+        const stepClasses = isActive
+          ? activeStepClasses[step.id] ?? "border-slate-300 bg-slate-100 shadow-sm"
+          : "border-slate-200 bg-white";
 
         const badgeClasses = isComplete
           ? "border-emerald-200 bg-emerald-50 text-emerald-700"
@@ -47,9 +29,9 @@ export default function Stepper({ steps = DEFAULT_STEPS, activeStepId = 1 }) {
           <li key={step.id}>
             <button
               type="button"
-              className={`w-full rounded-xl border px-3 py-3 text-left transition focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-1 ${
-                isActive ? step.activeClasses : "border-slate-200 bg-white"
-              } hover:border-slate-300`}
+              onClick={() => onSelectStep(step.id)}
+              aria-current={step.id === activeStepId ? "step" : undefined}
+              className={`w-full rounded-xl border px-3 py-3 text-left transition focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-1 hover:border-slate-300 ${stepClasses}`}
             >
               <div className="flex items-center gap-3">
                 <div
@@ -63,7 +45,11 @@ export default function Stepper({ steps = DEFAULT_STEPS, activeStepId = 1 }) {
                 <span
                   className={`rounded-full border px-2.5 py-1 text-xs font-medium ${badgeClasses}`}
                 >
-                  {badgeText}
+                  {step.status === "complete"
+                    ? "Complete"
+                    : step.status === "active"
+                      ? "Active"
+                      : "Incomplete"}
                 </span>
               </div>
             </button>
