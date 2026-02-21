@@ -18,15 +18,29 @@ function createGoalId() {
   return `goal-${Date.now()}-${Math.floor(Math.random() * 1000000)}`;
 }
 
+function createConstraintId() {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID();
+  }
+
+  return `constraint-${Date.now()}-${Math.floor(Math.random() * 1000000)}`;
+}
+
 function isGoalValid(goal) {
   return goal.title.trim().length > 0 && goal.successCriteria.trim().length > 0;
+}
+
+function isConstraintValid(constraint) {
+  return constraint.text.trim().length > 0;
 }
 
 export default function ProjectSetupPanel() {
   const [activeStepId, setActiveStepId] = useState(1);
   const [goals, setGoals] = useState([]);
+  const [constraints, setConstraints] = useState([]);
 
   const isGoalsComplete = goals.some((goal) => isGoalValid(goal));
+  const isConstraintsComplete = constraints.some((constraint) => isConstraintValid(constraint));
 
   const steps = useMemo(
     () =>
@@ -41,12 +55,22 @@ export default function ProjectSetupPanel() {
           return { ...step, status };
         }
 
+        if (step.id === 2) {
+          const status = isConstraintsComplete
+            ? "complete"
+            : activeStepId === 2
+              ? "active"
+              : "incomplete";
+
+          return { ...step, status };
+        }
+
         return {
           ...step,
           status: activeStepId === step.id ? "active" : "incomplete",
         };
       }),
-    [activeStepId, isGoalsComplete],
+    [activeStepId, isGoalsComplete, isConstraintsComplete],
   );
 
   const currentStep = steps.find((step) => step.id === activeStepId) ?? steps[0];
@@ -86,6 +110,37 @@ export default function ProjectSetupPanel() {
     setGoals((previous) => previous.filter((goal) => goal.id !== goalId));
   };
 
+  const handleAddConstraint = ({ text }) => {
+    setConstraints((previous) => [
+      ...previous,
+      {
+        id: createConstraintId(),
+        text: text.trim(),
+      },
+    ]);
+  };
+
+  const handleUpdateConstraint = (constraintId, updates) => {
+    const normalizedUpdates = { ...updates };
+    if (typeof normalizedUpdates.text === "string") {
+      normalizedUpdates.text = normalizedUpdates.text.trim();
+    }
+
+    setConstraints((previous) =>
+      previous.map((constraint) =>
+        constraint.id === constraintId
+          ? { ...constraint, ...normalizedUpdates }
+          : constraint,
+      ),
+    );
+  };
+
+  const handleDeleteConstraint = (constraintId) => {
+    setConstraints((previous) =>
+      previous.filter((constraint) => constraint.id !== constraintId),
+    );
+  };
+
   return (
     <section className="lg:col-span-4">
       <div className="flex flex-col rounded-2xl border border-slate-200 bg-white p-5 shadow-sm lg:h-[calc(100vh-7.5rem)]">
@@ -104,6 +159,10 @@ export default function ProjectSetupPanel() {
             onAddGoal={handleAddGoal}
             onUpdateGoal={handleUpdateGoal}
             onDeleteGoal={handleDeleteGoal}
+            constraints={constraints}
+            onAddConstraint={handleAddConstraint}
+            onUpdateConstraint={handleUpdateConstraint}
+            onDeleteConstraint={handleDeleteConstraint}
           />
         </div>
 

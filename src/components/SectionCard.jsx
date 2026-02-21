@@ -1,3 +1,4 @@
+import ConstraintsStep from "./ConstraintsStep";
 import GoalsStep from "./GoalsStep";
 
 const STEP_META = {
@@ -52,6 +53,10 @@ export default function SectionCard({
   onAddGoal,
   onUpdateGoal,
   onDeleteGoal,
+  constraints,
+  onAddConstraint,
+  onUpdateConstraint,
+  onDeleteConstraint,
 }) {
   const currentStep = STEP_META[activeStepId] ?? STEP_META[1];
 
@@ -73,6 +78,13 @@ export default function SectionCard({
           onAddGoal={onAddGoal}
           onUpdateGoal={onUpdateGoal}
           onDeleteGoal={onDeleteGoal}
+        />
+      ) : activeStepId === 2 ? (
+        <ConstraintsStep
+          constraints={constraints}
+          onAddConstraint={onAddConstraint}
+          onUpdateConstraint={onUpdateConstraint}
+          onDeleteConstraint={onDeleteConstraint}
         />
       ) : (
         <PlaceholderStepContent title={currentStep.name} />
