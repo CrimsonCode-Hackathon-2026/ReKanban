@@ -5,16 +5,16 @@ export default function Header() {
         <p className="text-lg font-bold tracking-tight">ReKanban</p>
 
         <div className="flex items-center gap-4">
-          <span className="rounded-full border border-slate-200 bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">
+          {/* <span className="rounded-full border border-slate-200 bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">
             Project: Enter your project name
-          </span>
+          </span> */}
 
           <a
             href="https://wsu-acm.github.io/crimsoncode"
             target="_blank"
             className="text-sm font-medium text-slate-500"
           >
-            Hackathon
+            CrimsonCode Hackathon
           </a>
         </div>
       </div>
