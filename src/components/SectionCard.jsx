@@ -2,6 +2,7 @@ import ConstraintsStep from "./ConstraintsStep";
 import ContextStep from "./ContextStep";
 import GoalsStep from "./GoalsStep";
 import GuardrailsStep from "./GuardrailsStep";
+import RepositorySelectionStep from "./RepositorySelectionStep";
 
 const STEP_META = {
   1: {
@@ -31,6 +32,13 @@ const STEP_META = {
     panelClasses: "border-rose-200 bg-rose-100/80",
     labelClasses: "text-rose-900",
     chipClasses: "bg-white/80 text-rose-800",
+  },
+  5: {
+    name: "Repository",
+    subtitle: "Choose the GitHub destination for generated issues.",
+    panelClasses: "border-emerald-200 bg-emerald-100/80",
+    labelClasses: "text-emerald-900",
+    chipClasses: "bg-white/80 text-emerald-800",
   },
 };
 
@@ -64,6 +72,11 @@ export default function SectionCard({
   guardrailsSelections,
   onToggleGuardrail,
   onUpdateGuardrailsOther,
+  ownerRepositoryOptions,
+  selectedOwner,
+  selectedRepo,
+  onSelectOwner,
+  onSelectRepo,
 }) {
   const currentStep = STEP_META[activeStepId] ?? STEP_META[1];
 
@@ -100,6 +113,14 @@ export default function SectionCard({
           value={guardrailsSelections}
           onToggle={onToggleGuardrail}
           onOtherChange={onUpdateGuardrailsOther}
+        />
+      ) : activeStepId === 5 ? (
+        <RepositorySelectionStep
+          ownerRepositoryOptions={ownerRepositoryOptions}
+          selectedOwner={selectedOwner}
+          selectedRepo={selectedRepo}
+          onSelectOwner={onSelectOwner}
+          onSelectRepo={onSelectRepo}
         />
       ) : (
         <PlaceholderStepContent title={currentStep.name} />
