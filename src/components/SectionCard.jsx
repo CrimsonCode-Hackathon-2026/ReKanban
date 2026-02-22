@@ -1,4 +1,5 @@
 import ConstraintsStep from "./ConstraintsStep";
+import ContextStep from "./ContextStep";
 import GoalsStep from "./GoalsStep";
 
 const STEP_META = {
@@ -57,6 +58,8 @@ export default function SectionCard({
   onAddConstraint,
   onUpdateConstraint,
   onDeleteConstraint,
+  contextText,
+  onContextChange,
 }) {
   const currentStep = STEP_META[activeStepId] ?? STEP_META[1];
 
@@ -86,6 +89,8 @@ export default function SectionCard({
           onUpdateConstraint={onUpdateConstraint}
           onDeleteConstraint={onDeleteConstraint}
         />
+      ) : activeStepId === 3 ? (
+        <ContextStep value={contextText} onChange={onContextChange} />
       ) : (
         <PlaceholderStepContent title={currentStep.name} />
       )}

@@ -38,9 +38,11 @@ export default function ProjectSetupPanel() {
   const [activeStepId, setActiveStepId] = useState(1);
   const [goals, setGoals] = useState([]);
   const [constraints, setConstraints] = useState([]);
+  const [contextText, setContextText] = useState("");
 
   const isGoalsComplete = goals.some((goal) => isGoalValid(goal));
   const isConstraintsComplete = constraints.some((constraint) => isConstraintValid(constraint));
+  const isContextComplete = contextText.trim().length >= 20;
 
   const steps = useMemo(
     () =>
@@ -65,12 +67,22 @@ export default function ProjectSetupPanel() {
           return { ...step, status };
         }
 
+        if (step.id === 3) {
+          const status = isContextComplete
+            ? "complete"
+            : activeStepId === 3
+              ? "active"
+              : "incomplete";
+
+          return { ...step, status };
+        }
+
         return {
           ...step,
           status: activeStepId === step.id ? "active" : "incomplete",
         };
       }),
-    [activeStepId, isGoalsComplete, isConstraintsComplete],
+    [activeStepId, isGoalsComplete, isConstraintsComplete, isContextComplete],
   );
 
   const currentStep = steps.find((step) => step.id === activeStepId) ?? steps[0];
@@ -163,6 +175,8 @@ export default function ProjectSetupPanel() {
             onAddConstraint={handleAddConstraint}
             onUpdateConstraint={handleUpdateConstraint}
             onDeleteConstraint={handleDeleteConstraint}
+            contextText={contextText}
+            onContextChange={setContextText}
           />
         </div>
 
