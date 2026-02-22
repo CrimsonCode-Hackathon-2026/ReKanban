@@ -33,19 +33,22 @@ export async function isLoggedIn() : Promise<boolean> {
 export async function getRepos() : Promise<Repos> {
     const { data, error: errorSession } = await SupabaseClient.auth.getSession();
     if ( data.session == null || errorSession ) { throw new Error(errorSession?.message) }
-    
-    await SupabaseClient.auth.refreshSession();
+    const github_token = data.session.provider_token;
 
-    const { data: func_data, error: error } = await SupabaseClient.functions.invoke('retrieve-repos', {});
+    const { data: func_data, error: error } = await SupabaseClient.functions.invoke('retrieve-repos', { body: {github_token}  });
     if ( error ) { throw new Error(error.message) }
 
     return func_data.list;
 }
 
 export async function generatedTasks(owner: string, repo: string, payload : any) {
+    const { data, error: errorSession } = await SupabaseClient.auth.getSession();
+    if ( data.session == null || errorSession ) { throw new Error(errorSession?.message) }
+    const github_token = data.session.provider_token;
+
 
     const { data: func_data, error } = await SupabaseClient.functions.invoke('create-github-issues', {
-        body: { owner, repo, payload },
+        body: { github_token, owner, repo, payload },
     });
     if ( error ) { throw new Error(error.message) }
 
