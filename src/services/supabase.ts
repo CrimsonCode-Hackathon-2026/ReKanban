@@ -34,6 +34,8 @@ export async function getRepos() : Promise<Repos> {
     const { data, error: errorSession } = await SupabaseClient.auth.getSession();
     if ( data.session == null || errorSession ) { throw new Error(errorSession?.message) }
     
+    await SupabaseClient.auth.refreshSession();
+
     const { data: func_data, error: error } = await SupabaseClient.functions.invoke('retrieve-repos', {});
     if ( error ) { throw new Error(error.message) }
 
