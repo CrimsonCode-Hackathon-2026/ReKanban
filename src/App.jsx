@@ -1,9 +1,10 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Header from "./components/Header";
 import ProjectSetupPanel from "./components/ProjectSetupPanel";
 import SectionCard from "./components/SectionCard";
 import GithubConnectModal from "./components/github/GithubConnectModal";
 import GeneratingOverlay from "./components/GeneratingOverlay";
+import GenerationSuccessOverlay from "./components/GenerationSuccessOverlay";
 
 const STEP_SEQUENCE = [
   { id: 1, name: "Goals" },
@@ -41,6 +42,7 @@ function isConstraintValid(constraint) {
 export default function App() {
   const [isGithubModalOpen, setIsGithubModalOpen] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isGenerated, setIsGenerated] = useState(false);
   const [projectTitle] = useState("Hackathon MVP");
   const [activeStepId, setActiveStepId] = useState(1);
   const [goals, setGoals] = useState([]);
@@ -53,6 +55,7 @@ export default function App() {
     product: [],
     other: "",
   });
+  const generationTimerRef = useRef(null);
 
   const isGoalsComplete = goals.some((goal) => isGoalValid(goal));
   const isConstraintsComplete = constraints.some((constraint) => isConstraintValid(constraint));
@@ -211,8 +214,35 @@ export default function App() {
     };
 
     console.log(payload);
+    setIsGenerated(false);
     setIsGenerating(true);
+
+    if (generationTimerRef.current) {
+      window.clearTimeout(generationTimerRef.current);
+    }
+
+    generationTimerRef.current = window.setTimeout(() => {
+      setIsGenerating(false);
+      setIsGenerated(true);
+      generationTimerRef.current = null;
+    }, 5000);
   };
+
+  useEffect(() => {
+    if (!isGenerated) {
+      return;
+    }
+
+    setIsGenerating(false);
+  }, [isGenerated]);
+
+  useEffect(() => {
+    return () => {
+      if (generationTimerRef.current) {
+        window.clearTimeout(generationTimerRef.current);
+      }
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
@@ -272,6 +302,10 @@ export default function App() {
       </main>
 
       {isGenerating && <GeneratingOverlay open={isGenerating} />}
+      <GenerationSuccessOverlay
+        open={isGenerated}
+        onClose={() => setIsGenerated(false)}
+      />
     </div>
   );
 }
