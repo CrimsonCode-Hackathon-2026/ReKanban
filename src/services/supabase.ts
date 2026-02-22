@@ -41,16 +41,16 @@ export async function getRepos() : Promise<Repos> {
     return func_data.list;
 }
 
-export async function generatedTasks(owner: string, repo: string, payload : any) {
+// returns issue link upon success
+export async function generatedTasks(owner: string, repo: string, payload : any) : Promise<string> {
     const { data, error: errorSession } = await SupabaseClient.auth.getSession();
     if ( data.session == null || errorSession ) { throw new Error(errorSession?.message) }
     const github_token = data.session.provider_token;
-
 
     const { data: func_data, error } = await SupabaseClient.functions.invoke('create-github-issues', {
         body: { github_token, owner, repo, payload },
     });
     if ( error ) { throw new Error(error.message) }
 
-    return;
+    return func_data.issue_link;
 }

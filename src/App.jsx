@@ -254,18 +254,19 @@ export default function App() {
         security: [...guardrailsSelections.security],
         standards: [...guardrailsSelections.standards],
         ethics: [...guardrailsSelections.ethics],
-        product_principles: [...guardrailsSelections.product],
         other: guardrailsSelections.other.trim(),
-      },
-      github: {
-        owner: selectedOwner,
-        repo: selectedRepo,
-      },
+      }
     };
 
     setIsGenerated(false);
     setIsGenerating(true);
-    await generatedTasks(selectedOwner, selectedRepo, payload);
+    try
+    {
+      await generatedTasks(selectedOwner, selectedRepo, payload);
+    }
+    catch(error) {
+      console.log("error generating tasks", error.message)
+    }
 
     setIsGenerated(true);
     setIsGenerating(false); 
