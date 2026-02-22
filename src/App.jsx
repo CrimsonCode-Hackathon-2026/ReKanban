@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import Header from "./components/Header";
 import ProjectSetupPanel from "./components/ProjectSetupPanel";
 import SectionCard from "./components/SectionCard";
@@ -12,44 +12,6 @@ const STEP_SEQUENCE = [
 ];
 
 const GUARDRAIL_ARRAY_KEYS = ["security", "standards", "ethics", "product"];
-const INSTALLATION_STORAGE_KEY = "gh_installation_id";
-const REPO_STORAGE_KEY = "gh_repo_full_name";
-
-function readStoredValue(key) {
-  if (typeof window === "undefined") {
-    return "";
-  }
-
-  try {
-    return window.localStorage.getItem(key) || "";
-  } catch {
-    return "";
-  }
-}
-
-function writeStoredValue(key, value) {
-  if (typeof window === "undefined") {
-    return;
-  }
-
-  try {
-    window.localStorage.setItem(key, value);
-  } catch {
-    // no-op
-  }
-}
-
-function removeStoredValue(key) {
-  if (typeof window === "undefined") {
-    return;
-  }
-
-  try {
-    window.localStorage.removeItem(key);
-  } catch {
-    // no-op
-  }
-}
 
 function createGoalId() {
   if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
@@ -76,15 +38,7 @@ function isConstraintValid(constraint) {
 }
 
 export default function App() {
-  const [githubInstallationId, setGithubInstallationId] = useState(() =>
-    readStoredValue(INSTALLATION_STORAGE_KEY),
-  );
-  const [githubRepoFullName, setGithubRepoFullName] = useState(() =>
-    readStoredValue(REPO_STORAGE_KEY),
-  );
-  const [isGithubModalOpen, setIsGithubModalOpen] = useState(
-    () => !readStoredValue(REPO_STORAGE_KEY),
-  );
+  const [isGithubModalOpen, setIsGithubModalOpen] = useState(false);
   const [projectTitle] = useState("Hackathon MVP");
   const [activeStepId, setActiveStepId] = useState(1);
   const [goals, setGoals] = useState([]);
@@ -232,58 +186,6 @@ export default function App() {
     setGuardrailsSelections((previous) => ({ ...previous, other: text }));
   };
 
-  useEffect(() => {
-    if (typeof window === "undefined") {
-      return;
-    }
-
-    const params = new URLSearchParams(window.location.search);
-    const installationIdFromQuery = params.get("installation_id");
-
-    if (installationIdFromQuery) {
-      writeStoredValue(INSTALLATION_STORAGE_KEY, installationIdFromQuery);
-      params.delete("installation_id");
-      const nextSearch = params.toString();
-      const nextUrl = `${window.location.pathname}${
-        nextSearch ? `?${nextSearch}` : ""
-      }${window.location.hash}`;
-      window.history.replaceState(window.history.state, "", nextUrl);
-    }
-
-    const storedInstallationId = readStoredValue(INSTALLATION_STORAGE_KEY);
-    const storedRepoFullName = readStoredValue(REPO_STORAGE_KEY);
-    setGithubInstallationId(storedInstallationId);
-    setGithubRepoFullName(storedRepoFullName);
-    setIsGithubModalOpen(!storedRepoFullName);
-  }, []);
-
-  const handleGithubConnected = ({ installationId, repoFullName }) => {
-    const normalizedInstallationId =
-      installationId === undefined || installationId === null || installationId === ""
-        ? ""
-        : String(installationId);
-    const normalizedRepoFullName = repoFullName ? String(repoFullName) : "";
-
-    if (normalizedInstallationId) {
-      writeStoredValue(INSTALLATION_STORAGE_KEY, normalizedInstallationId);
-      setGithubInstallationId(normalizedInstallationId);
-    }
-
-    if (!normalizedRepoFullName) {
-      return;
-    }
-
-    writeStoredValue(REPO_STORAGE_KEY, normalizedRepoFullName);
-    setGithubRepoFullName(normalizedRepoFullName);
-    setIsGithubModalOpen(false);
-  };
-
-  const handleChangeRepo = () => {
-    removeStoredValue(REPO_STORAGE_KEY);
-    setGithubRepoFullName("");
-    setIsGithubModalOpen(true);
-  };
-
   const handleGeneratePlan = () => {
     if (isGenerateDisabled) {
       return;
@@ -309,71 +211,62 @@ export default function App() {
     console.log("RequestPayload:\n", JSON.stringify(payload, null, 2));
   };
 
-  const hasSelectedRepo = githubRepoFullName.trim().length > 0;
-  const shouldShowConnectModal = isGithubModalOpen || !hasSelectedRepo;
-
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
       <Header />
 
       <GithubConnectModal
-        isOpen={shouldShowConnectModal}
-        installationId={githubInstallationId}
-        onConnected={handleGithubConnected}
+        isOpen={isGithubModalOpen}
+        onConnected={() => setIsGithubModalOpen(false)}
         onClose={() => setIsGithubModalOpen(false)}
       />
 
-      {hasSelectedRepo && (
-        <main className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-          <div className="mb-4 flex items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
-            <p className="text-sm text-slate-700">
-              Target repo: <span className="font-semibold text-slate-900">{githubRepoFullName}</span>
-            </p>
-            <button
-              type="button"
-              onClick={handleChangeRepo}
-              className="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-900 hover:bg-slate-100"
-            >
-              Change
-            </button>
-          </div>
+      <main className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+        <div className="mb-4 flex justify-end">
+          <button
+            type="button"
+            onClick={() => setIsGithubModalOpen(true)}
+            className="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-900 hover:bg-slate-100"
+          >
+            Open GitHub Modal
+          </button>
+        </div>
 
-          <div className="grid gap-6 lg:grid-cols-12">
-            <ProjectSetupPanel
-              steps={steps}
-              activeStepId={activeStepId}
-              onSelectStep={handleSelectStep}
-              onBack={handleBack}
-              onNext={handleNext}
-              onGeneratePlan={handleGeneratePlan}
-              isBackDisabled={isBackDisabled}
-              isNextDisabled={isNextDisabled}
-              isGenerateDisabled={isGenerateDisabled}
-            />
+        <div className="grid gap-6 lg:grid-cols-12">
+          <ProjectSetupPanel
+            steps={steps}
+            activeStepId={activeStepId}
+            onSelectStep={handleSelectStep}
+            onBack={handleBack}
+            onNext={handleNext}
+            onGeneratePlan={handleGeneratePlan}
+            isBackDisabled={isBackDisabled}
+            isNextDisabled={isNextDisabled}
+            isGenerateDisabled={isGenerateDisabled}
+          />
 
-            <section className="lg:col-span-8">
-              <div className="lg:h-[calc(100vh-7.5rem)] lg:overflow-y-auto lg:pr-1">
-                <SectionCard
-                  activeStepId={activeStepId}
-                  goals={goals}
-                  onAddGoal={handleAddGoal}
-                  onUpdateGoal={handleUpdateGoal}
-                  onDeleteGoal={handleDeleteGoal}
-                  constraints={constraints}
-                  onAddConstraint={handleAddConstraint}
-                  onUpdateConstraint={handleUpdateConstraint}
-                  onDeleteConstraint={handleDeleteConstraint}
-                  contextText={contextText}
-                  onContextChange={setContextText}
-                  guardrailsSelections={guardrailsSelections}
-                  onToggleGuardrail={toggleGuardrail}
-                  onUpdateGuardrailsOther={updateGuardrailsOther}
-                />
-              </div>
-            </section>
-          </div>
-        </main>
-      )}
+          <section className="lg:col-span-8">
+            <div className="lg:h-[calc(100vh-7.5rem)] lg:overflow-y-auto lg:pr-1">
+              <SectionCard
+                activeStepId={activeStepId}
+                goals={goals}
+                onAddGoal={handleAddGoal}
+                onUpdateGoal={handleUpdateGoal}
+                onDeleteGoal={handleDeleteGoal}
+                constraints={constraints}
+                onAddConstraint={handleAddConstraint}
+                onUpdateConstraint={handleUpdateConstraint}
+                onDeleteConstraint={handleDeleteConstraint}
+                contextText={contextText}
+                onContextChange={setContextText}
+                guardrailsSelections={guardrailsSelections}
+                onToggleGuardrail={toggleGuardrail}
+                onUpdateGuardrailsOther={updateGuardrailsOther}
+              />
+            </div>
+          </section>
+        </div>
+      </main>
     </div>
   );
 }
