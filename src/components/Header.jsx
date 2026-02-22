@@ -14,7 +14,7 @@ export default function Header() {
             target="_blank"
             className="text-sm font-medium text-slate-500"
           >
-            CrimsonCode Hackathon
+            CrimsonCode Hackathon 2026
           </a>
         </div>
       </div>
