@@ -15,16 +15,6 @@ const STEP_SEQUENCE = [
 ];
 
 const GUARDRAIL_ARRAY_KEYS = ["security", "standards", "ethics", "product"];
-const OWNER_REPOSITORY_OPTIONS = [
-  {
-    owner: "CrimsonCode-Hackathon-2026",
-    repos: ["ReKanban", "Demo-API"],
-  },
-  {
-    owner: "jacku",
-    repos: ["personal-sandbox", "rekanban-experiments"],
-  },
-];
 
 function createGoalId() {
   if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
@@ -66,6 +56,7 @@ export default function App() {
     product: [],
     other: "",
   });
+  const [ownerRepositoryOptions] = useState(null);
   const [selectedOwner, setSelectedOwner] = useState("");
   const [selectedRepo, setSelectedRepo] = useState("");
   const generationTimerRef = useRef(null);
@@ -211,7 +202,9 @@ export default function App() {
   const handleSelectOwner = (owner) => {
     setSelectedOwner(owner);
 
-    const ownerEntry = OWNER_REPOSITORY_OPTIONS.find((entry) => entry.owner === owner);
+    const ownerEntry = Array.isArray(ownerRepositoryOptions)
+      ? ownerRepositoryOptions.find((entry) => entry.owner === owner)
+      : null;
     if (!ownerEntry || !ownerEntry.repos.includes(selectedRepo)) {
       setSelectedRepo("");
     }
@@ -220,6 +213,8 @@ export default function App() {
   const handleSelectRepo = (repo) => {
     setSelectedRepo(repo);
   };
+
+  const handleGithubLogout = () => {};
 
   const handleGeneratePlan = () => {
     if (isGenerateDisabled) {
@@ -290,13 +285,23 @@ export default function App() {
 
       <main className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <div className="mb-4 flex justify-end">
-          <button
-            type="button"
-            onClick={() => setIsGithubModalOpen(true)}
-            className="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-900 hover:bg-slate-100"
-          >
-            Open GitHub Modal
-          </button>
+          {ownerRepositoryOptions === null ? (
+            <button
+              type="button"
+              onClick={() => setIsGithubModalOpen(true)}
+              className="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-900 hover:bg-slate-100"
+            >
+              Open GitHub Modal
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={handleGithubLogout}
+              className="inline-flex items-center justify-center rounded-lg border border-rose-300 bg-rose-50 px-3 py-1.5 text-sm font-medium text-rose-700 hover:bg-rose-100"
+            >
+              Log out of GitHub
+            </button>
+          )}
         </div>
 
         <div className="grid gap-6 lg:grid-cols-12">
@@ -329,7 +334,7 @@ export default function App() {
                 guardrailsSelections={guardrailsSelections}
                 onToggleGuardrail={toggleGuardrail}
                 onUpdateGuardrailsOther={updateGuardrailsOther}
-                ownerRepositoryOptions={OWNER_REPOSITORY_OPTIONS}
+                ownerRepositoryOptions={ownerRepositoryOptions}
                 selectedOwner={selectedOwner}
                 selectedRepo={selectedRepo}
                 onSelectOwner={handleSelectOwner}
