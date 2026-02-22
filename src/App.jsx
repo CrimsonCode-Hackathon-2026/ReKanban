@@ -56,7 +56,7 @@ export default function App() {
     product: [],
     other: "",
   });
-  const [ownerRepositoryOptions, setOwnerRepositoryOptions] = useState();
+  const [ownerRepositoryOptions, setOwnerRepositoryOptions] = useState(null);
   const [selectedOwner, setSelectedOwner] = useState("");
   const [selectedRepo, setSelectedRepo] = useState("");
   const generationTimerRef = useRef(null);
