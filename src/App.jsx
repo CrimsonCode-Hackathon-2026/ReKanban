@@ -70,12 +70,12 @@ export default function App() {
         getRepos().then((repos) => {
           console.log(repos);
           setOwnerRepositoryOptions(repos);
-        }).catch(console.warn("Failed To Populate Owner/Repos"));
+        }).catch( () => { console.warn("Failed To Populate Owner/Repos") });
       } else {
         setIsGithubModalOpen(true);
         console.warn("Not logged In");
       }
-    })
+    }).catch(() => { console.warn("Failed To Check Login Status") } );
   }, []);
 
 
@@ -234,6 +234,7 @@ export default function App() {
 
   const handleGithubLogout = () => {
     logout();
+    SetIsLoggedInBool(false);
     setIsGithubModalOpen(true);
   };
 
