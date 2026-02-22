@@ -1,7 +1,10 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Header from "./components/Header";
 import ProjectSetupPanel from "./components/ProjectSetupPanel";
 import SectionCard from "./components/SectionCard";
+import GithubConnectModal from "./components/github/GithubConnectModal";
+import GeneratingOverlay from "./components/GeneratingOverlay";
+import GenerationSuccessOverlay from "./components/GenerationSuccessOverlay";
 
 const STEP_SEQUENCE = [
   { id: 1, name: "Goals" },
@@ -37,6 +40,9 @@ function isConstraintValid(constraint) {
 }
 
 export default function App() {
+  const [isGithubModalOpen, setIsGithubModalOpen] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [isGenerated, setIsGenerated] = useState(false);
   const [projectTitle] = useState("Hackathon MVP");
   const [activeStepId, setActiveStepId] = useState(1);
   const [goals, setGoals] = useState([]);
@@ -49,6 +55,7 @@ export default function App() {
     product: [],
     other: "",
   });
+  const generationTimerRef = useRef(null);
 
   const isGoalsComplete = goals.some((goal) => isGoalValid(goal));
   const isConstraintsComplete = constraints.some((constraint) => isConstraintValid(constraint));
@@ -206,14 +213,58 @@ export default function App() {
       },
     };
 
-    console.log("RequestPayload:\n", JSON.stringify(payload, null, 2));
+    console.log(payload);
+    setIsGenerated(false);
+    setIsGenerating(true);
+
+    if (generationTimerRef.current) {
+      window.clearTimeout(generationTimerRef.current);
+    }
+
+    generationTimerRef.current = window.setTimeout(() => {
+      setIsGenerating(false);
+      setIsGenerated(true);
+      generationTimerRef.current = null;
+    }, 5000);
   };
+
+  useEffect(() => {
+    if (!isGenerated) {
+      return;
+    }
+
+    setIsGenerating(false);
+  }, [isGenerated]);
+
+  useEffect(() => {
+    return () => {
+      if (generationTimerRef.current) {
+        window.clearTimeout(generationTimerRef.current);
+      }
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
       <Header />
 
+      <GithubConnectModal
+        isOpen={isGithubModalOpen}
+        onConnected={() => setIsGithubModalOpen(false)}
+        onClose={() => setIsGithubModalOpen(false)}
+      />
+
       <main className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+        <div className="mb-4 flex justify-end">
+          <button
+            type="button"
+            onClick={() => setIsGithubModalOpen(true)}
+            className="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-900 hover:bg-slate-100"
+          >
+            Open GitHub Modal
+          </button>
+        </div>
+
         <div className="grid gap-6 lg:grid-cols-12">
           <ProjectSetupPanel
             steps={steps}
@@ -249,6 +300,12 @@ export default function App() {
           </section>
         </div>
       </main>
+
+      {isGenerating && <GeneratingOverlay open={isGenerating} />}
+      <GenerationSuccessOverlay
+        open={isGenerated}
+        onClose={() => setIsGenerated(false)}
+      />
     </div>
   );
 }
