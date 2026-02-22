@@ -22,13 +22,13 @@ function buildUrl(endpointKey, query = {}) {
   }
   if (!API_CONFIG.baseUrl) {
     throw new Error(
-      "Missing API base URL. Set VITE_EDGE_FUNCTIONS_BASE_URL or VITE_SUPABASE_URL."
+      "Missing API base URL. Set VITE_EDGE_FUNCTIONS_BASE_URL or VITE_SUPABASE_URL.",
     );
   }
 
   const url = new URL(
     `${API_CONFIG.baseUrl.replace(/\/+$/, "")}/${endpoint}`,
-    window.location.origin
+    window.location.origin,
   );
 
   Object.entries(query).forEach(([key, value]) => {
