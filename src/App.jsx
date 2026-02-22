@@ -3,6 +3,7 @@ import Header from "./components/Header";
 import ProjectSetupPanel from "./components/ProjectSetupPanel";
 import SectionCard from "./components/SectionCard";
 import GithubConnectModal from "./components/github/GithubConnectModal";
+import GeneratingOverlay from "./components/GeneratingOverlay";
 
 const STEP_SEQUENCE = [
   { id: 1, name: "Goals" },
@@ -39,6 +40,7 @@ function isConstraintValid(constraint) {
 
 export default function App() {
   const [isGithubModalOpen, setIsGithubModalOpen] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
   const [projectTitle] = useState("Hackathon MVP");
   const [activeStepId, setActiveStepId] = useState(1);
   const [goals, setGoals] = useState([]);
@@ -208,7 +210,8 @@ export default function App() {
       },
     };
 
-    console.log("RequestPayload:\n", JSON.stringify(payload, null, 2));
+    console.log(payload);
+    setIsGenerating(true);
   };
 
   return (
@@ -267,6 +270,8 @@ export default function App() {
           </section>
         </div>
       </main>
+
+      {isGenerating && <GeneratingOverlay open={isGenerating} />}
     </div>
   );
 }
