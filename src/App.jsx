@@ -67,65 +67,35 @@ export default function App() {
     isContextComplete &&
     isGuardrailsComplete;
 
-  const steps = useMemo(
-    () =>
-      STEP_SEQUENCE.map((step) => {
-        if (step.id === 1) {
-          const status = isGoalsComplete
-            ? "complete"
-            : activeStepId === 1
-              ? "active"
-              : "incomplete";
+  const steps = useMemo(() => {
+    const completionByStepId = {
+      1: isGoalsComplete,
+      2: isConstraintsComplete,
+      3: isContextComplete,
+      4: isGuardrailsComplete,
+    };
 
-          return { ...step, status };
-        }
+    return STEP_SEQUENCE.map((step) => {
+      const isActive = activeStepId === step.id;
+      const isComplete = Boolean(completionByStepId[step.id]);
 
-        if (step.id === 2) {
-          const status = isConstraintsComplete
-            ? "complete"
-            : activeStepId === 2
-              ? "active"
-              : "incomplete";
-
-          return { ...step, status };
-        }
-
-        if (step.id === 3) {
-          const status = isContextComplete
-            ? "complete"
-            : activeStepId === 3
-              ? "active"
-              : "incomplete";
-
-          return { ...step, status };
-        }
-
-        if (step.id === 4) {
-          const status = isGuardrailsComplete
-            ? "complete"
-            : activeStepId === 4
-              ? "active"
-              : "incomplete";
-
-          return { ...step, status };
-        }
-
-        return {
-          ...step,
-          status: activeStepId === step.id ? "active" : "incomplete",
-        };
-      }),
-    [
-      activeStepId,
-      isGoalsComplete,
-      isConstraintsComplete,
-      isContextComplete,
-      isGuardrailsComplete,
-    ],
-  );
+      return {
+        ...step,
+        isActive,
+        isComplete,
+        status: isComplete ? "complete" : isActive ? "active" : "incomplete",
+      };
+    });
+  }, [
+    activeStepId,
+    isGoalsComplete,
+    isConstraintsComplete,
+    isContextComplete,
+    isGuardrailsComplete,
+  ]);
 
   const currentStep = steps.find((step) => step.id === activeStepId) ?? steps[0];
-  const isCurrentStepComplete = currentStep.status === "complete";
+  const isCurrentStepComplete = currentStep.isComplete;
 
   const isBackDisabled = activeStepId === 1;
   const isNextDisabled = activeStepId === STEP_SEQUENCE.length || !isCurrentStepComplete;

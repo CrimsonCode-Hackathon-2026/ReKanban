@@ -9,8 +9,16 @@ export default function Stepper({ steps, activeStepId, onSelectStep }) {
   return (
     <ol className="space-y-3" aria-label="Project setup steps">
       {steps.map((step) => {
-        const isActive = step.status === "active";
-        const isComplete = step.status === "complete";
+        const isActive =
+          typeof step.isActive === "boolean"
+            ? step.isActive
+            : step.status === "active" || step.id === activeStepId;
+
+        const isComplete =
+          typeof step.isComplete === "boolean"
+            ? step.isComplete
+            : step.status === "complete";
+
         const stepClasses = isActive
           ? activeStepClasses[step.id] ?? "border-slate-300 bg-slate-100 shadow-sm"
           : "border-slate-200 bg-white";
@@ -24,6 +32,8 @@ export default function Stepper({ steps, activeStepId, onSelectStep }) {
         const circleClasses = isComplete
           ? "border-emerald-200 bg-emerald-50 text-emerald-700"
           : "border-slate-300 bg-white text-slate-700";
+
+        const badgeText = isComplete ? "Complete" : isActive ? "Active" : "Incomplete";
 
         return (
           <li key={step.id}>
@@ -45,11 +55,7 @@ export default function Stepper({ steps, activeStepId, onSelectStep }) {
                 <span
                   className={`rounded-full border px-2.5 py-1 text-xs font-medium ${badgeClasses}`}
                 >
-                  {step.status === "complete"
-                    ? "Complete"
-                    : step.status === "active"
-                      ? "Active"
-                      : "Incomplete"}
+                  {badgeText}
                 </span>
               </div>
             </button>
