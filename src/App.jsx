@@ -11,9 +11,20 @@ const STEP_SEQUENCE = [
   { id: 2, name: "Constraints" },
   { id: 3, name: "Context" },
   { id: 4, name: "Guardrails" },
+  { id: 5, name: "Repository" },
 ];
 
 const GUARDRAIL_ARRAY_KEYS = ["security", "standards", "ethics", "product"];
+const OWNER_REPOSITORY_OPTIONS = [
+  {
+    owner: "CrimsonCode-Hackathon-2026",
+    repos: ["ReKanban", "Demo-API"],
+  },
+  {
+    owner: "jacku",
+    repos: ["personal-sandbox", "rekanban-experiments"],
+  },
+];
 
 function createGoalId() {
   if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
@@ -55,6 +66,8 @@ export default function App() {
     product: [],
     other: "",
   });
+  const [selectedOwner, setSelectedOwner] = useState("");
+  const [selectedRepo, setSelectedRepo] = useState("");
   const generationTimerRef = useRef(null);
 
   const isGoalsComplete = goals.some((goal) => isGoalValid(goal));
@@ -68,12 +81,14 @@ export default function App() {
 
   const isGuardrailsComplete =
     selectedGuardrailsCount > 0 || guardrailsSelections.other.trim().length >= 10;
+  const isRepositoryComplete = selectedOwner.length > 0 && selectedRepo.length > 0;
 
   const isAllStepsComplete =
     isGoalsComplete &&
     isConstraintsComplete &&
     isContextComplete &&
-    isGuardrailsComplete;
+    isGuardrailsComplete &&
+    isRepositoryComplete;
 
   const steps = useMemo(() => {
     const completionByStepId = {
@@ -81,6 +96,7 @@ export default function App() {
       2: isConstraintsComplete,
       3: isContextComplete,
       4: isGuardrailsComplete,
+      5: isRepositoryComplete,
     };
 
     return STEP_SEQUENCE.map((step) => {
@@ -100,6 +116,7 @@ export default function App() {
     isConstraintsComplete,
     isContextComplete,
     isGuardrailsComplete,
+    isRepositoryComplete,
   ]);
 
   const currentStep = steps.find((step) => step.id === activeStepId) ?? steps[0];
@@ -191,6 +208,19 @@ export default function App() {
     setGuardrailsSelections((previous) => ({ ...previous, other: text }));
   };
 
+  const handleSelectOwner = (owner) => {
+    setSelectedOwner(owner);
+
+    const ownerEntry = OWNER_REPOSITORY_OPTIONS.find((entry) => entry.owner === owner);
+    if (!ownerEntry || !ownerEntry.repos.includes(selectedRepo)) {
+      setSelectedRepo("");
+    }
+  };
+
+  const handleSelectRepo = (repo) => {
+    setSelectedRepo(repo);
+  };
+
   const handleGeneratePlan = () => {
     if (isGenerateDisabled) {
       return;
@@ -210,6 +240,10 @@ export default function App() {
         ethics: [...guardrailsSelections.ethics],
         product_principles: [...guardrailsSelections.product],
         other: guardrailsSelections.other.trim(),
+      },
+      github: {
+        owner: selectedOwner,
+        repo: selectedRepo,
       },
     };
 
@@ -295,6 +329,11 @@ export default function App() {
                 guardrailsSelections={guardrailsSelections}
                 onToggleGuardrail={toggleGuardrail}
                 onUpdateGuardrailsOther={updateGuardrailsOther}
+                ownerRepositoryOptions={OWNER_REPOSITORY_OPTIONS}
+                selectedOwner={selectedOwner}
+                selectedRepo={selectedRepo}
+                onSelectOwner={handleSelectOwner}
+                onSelectRepo={handleSelectRepo}
               />
             </div>
           </section>
@@ -305,6 +344,8 @@ export default function App() {
       <GenerationSuccessOverlay
         open={isGenerated}
         onClose={() => setIsGenerated(false)}
+        owner={selectedOwner}
+        repo={selectedRepo}
       />
     </div>
   );

@@ -4,6 +4,7 @@ export default function Stepper({ steps, activeStepId, onSelectStep }) {
     2: "border-sky-300 bg-sky-100 shadow-sm",
     3: "border-violet-300 bg-violet-100 shadow-sm",
     4: "border-rose-300 bg-rose-100 shadow-sm",
+    5: "border-emerald-300 bg-emerald-100 shadow-sm",
   };
 
   return (
