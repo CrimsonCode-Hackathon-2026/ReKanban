@@ -1,6 +1,7 @@
 import ConstraintsStep from "./ConstraintsStep";
 import ContextStep from "./ContextStep";
 import GoalsStep from "./GoalsStep";
+import GuardrailsStep from "./GuardrailsStep";
 
 const STEP_META = {
   1: {
@@ -60,6 +61,9 @@ export default function SectionCard({
   onDeleteConstraint,
   contextText,
   onContextChange,
+  guardrailsSelections,
+  onToggleGuardrail,
+  onUpdateGuardrailsOther,
 }) {
   const currentStep = STEP_META[activeStepId] ?? STEP_META[1];
 
@@ -91,6 +95,12 @@ export default function SectionCard({
         />
       ) : activeStepId === 3 ? (
         <ContextStep value={contextText} onChange={onContextChange} />
+      ) : activeStepId === 4 ? (
+        <GuardrailsStep
+          value={guardrailsSelections}
+          onToggle={onToggleGuardrail}
+          onOtherChange={onUpdateGuardrailsOther}
+        />
       ) : (
         <PlaceholderStepContent title={currentStep.name} />
       )}

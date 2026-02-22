@@ -1,4 +1,5 @@
 import { useState } from "react";
+import AddItemsToListWithPresetOptions from "./AddItemsToListWithPresetOptions";
 
 const PRESET_CONSTRAINTS = [
   "MVP only",
@@ -26,39 +27,10 @@ export default function ConstraintsStep({
   onUpdateConstraint,
   onDeleteConstraint,
 }) {
-  const [newConstraint, setNewConstraint] = useState({ text: "" });
   const [editingConstraintId, setEditingConstraintId] = useState(null);
   const [editingConstraint, setEditingConstraint] = useState({ text: "" });
-  const [showNewConstraintError, setShowNewConstraintError] = useState(false);
 
-  const isNewConstraintValid = isConstraintValid(newConstraint);
   const isEditingConstraintValid = isConstraintValid(editingConstraint);
-
-  const handleAddConstraint = (event) => {
-    event.preventDefault();
-
-    if (!isNewConstraintValid) {
-      setShowNewConstraintError(true);
-      return;
-    }
-
-    onAddConstraint(normalizeConstraintInput(newConstraint));
-    setNewConstraint({ text: "" });
-    setShowNewConstraintError(false);
-  };
-
-  const addPresetConstraint = (text) => {
-    const normalizedText = text.trim().toLowerCase();
-    const duplicateExists = constraints.some(
-      (constraint) => constraint.text.trim().toLowerCase() === normalizedText,
-    );
-
-    if (duplicateExists) {
-      return;
-    }
-
-    onAddConstraint({ text: text.trim() });
-  };
 
   const startEditing = (constraint) => {
     setEditingConstraintId(constraint.id);
@@ -86,61 +58,16 @@ export default function ConstraintsStep({
         Define limits and requirements. The plan must respect these.
       </p>
 
-      <div className="mt-4 rounded-xl border border-slate-200 bg-white/80 p-4">
-        <h4 className="text-sm font-semibold text-slate-900">Rules and Requirements</h4>
-
-        <div className="mt-3 flex flex-wrap gap-2">
-          {PRESET_CONSTRAINTS.map((preset) => (
-            <button
-              key={preset}
-              type="button"
-              onClick={() => addPresetConstraint(preset)}
-              className="rounded-full border border-slate-300 bg-slate-50 px-3 py-1 text-xs font-medium text-slate-700 transition hover:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-300"
-            >
-              {preset}
-            </button>
-          ))}
-        </div>
-
-        <form onSubmit={handleAddConstraint} className="mt-4 grid gap-3 sm:grid-cols-[1fr_auto]">
-          <div>
-            <label
-              htmlFor="constraint-text"
-              className="mb-1 block text-xs font-medium text-slate-700"
-            >
-              Constraint
-            </label>
-            <input
-              id="constraint-text"
-              type="text"
-              value={newConstraint.text}
-              onChange={(event) =>
-                setNewConstraint((previous) => ({
-                  ...previous,
-                  text: event.target.value,
-                }))
-              }
-              className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
-              placeholder="Keep scope to core workflow"
-              required
-            />
-          </div>
-
-          <div className="sm:self-end">
-            <button
-              type="submit"
-              className="h-10 w-full rounded-lg bg-slate-900 px-4 text-sm font-medium text-white transition hover:bg-slate-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 sm:w-auto"
-            >
-              Add constraint
-            </button>
-          </div>
-        </form>
-
-        {showNewConstraintError && !isNewConstraintValid ? (
-          <p className="mt-3 text-xs font-medium text-rose-600">
-            Constraint text is required.
-          </p>
-        ) : null}
+      <div className="mt-4">
+        <AddItemsToListWithPresetOptions
+          title="Rules and Requirements"
+          presetOptions={PRESET_CONSTRAINTS}
+          inputLabel="Constraint"
+          inputPlaceholder="Keep scope to core workflow"
+          addButtonLabel="Add constraint"
+          existingItems={constraints.map((constraint) => constraint.text)}
+          onAddItem={(text) => onAddConstraint({ text })}
+        />
       </div>
 
       <div className="mt-4 space-y-3">
