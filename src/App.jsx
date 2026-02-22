@@ -58,13 +58,15 @@ export default function App() {
     other: "",
   });
   const [ownerRepositoryOptions, setOwnerRepositoryOptions] = useState(null);
+  const [isLoggedInBool, SetIsLoggedInBool] = useState();
   const [selectedOwner, setSelectedOwner] = useState("");
   const [selectedRepo, setSelectedRepo] = useState("");
   const generationTimerRef = useRef(null);
 
   useEffect( () => {
-    isLoggedIn().then((isLoggedIn) => {
-      if (isLoggedIn) {
+    isLoggedIn().then((value) => {
+      SetIsLoggedInBool(value);
+      if (value) {
         getRepos().then((repos) => {
           console.log(repos);
           setOwnerRepositoryOptions(repos);
@@ -304,7 +306,7 @@ export default function App() {
 
       <main className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <div className="mb-4 flex justify-end">
-          {ownerRepositoryOptions === null ? (
+          {!isLoggedInBool ? (
             <button
               type="button"
               onClick={() => setIsGithubModalOpen(true) }
