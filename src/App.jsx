@@ -5,7 +5,7 @@ import SectionCard from "./components/SectionCard";
 import GithubConnectModal from "./components/github/GithubConnectModal";
 import GeneratingOverlay from "./components/GeneratingOverlay";
 import GenerationSuccessOverlay from "./components/GenerationSuccessOverlay";
-import { getRepos, isLoggedIn, logout } from "./services/supabase";
+import { generatedTasks, getRepos, isLoggedIn, logout } from "./services/supabase";
 
 const STEP_SEQUENCE = [
   { id: 1, name: "Goals" },
@@ -68,9 +68,8 @@ export default function App() {
       SetIsLoggedInBool(value);
       if (value) {
         getRepos().then((repos) => {
-          console.log(repos);
           setOwnerRepositoryOptions(repos);
-        }).catch( () => { console.warn("Failed To Populate Owner/Repos") });
+        }).catch( (error) => { console.warn("Failed To Populate Owner/Repos", error.message) });
       } else {
         setIsGithubModalOpen(true);
         console.warn("Not logged In");
@@ -238,7 +237,7 @@ export default function App() {
     setIsGithubModalOpen(true);
   };
 
-  const handleGeneratePlan = () => {
+  const handleGeneratePlan = async () => {
     if (isGenerateDisabled) {
       return;
     }
@@ -264,10 +263,14 @@ export default function App() {
       },
     };
 
-    console.log(payload);
     setIsGenerated(false);
     setIsGenerating(true);
+    await generatedTasks(selectedOwner, selectedRepo, payload);
 
+    setIsGenerated(true);
+    setIsGenerating(false); 
+
+    /*
     if (generationTimerRef.current) {
       window.clearTimeout(generationTimerRef.current);
     }
@@ -277,6 +280,8 @@ export default function App() {
       setIsGenerated(true);
       generationTimerRef.current = null;
     }, 5000);
+
+    */
   };
 
   useEffect(() => {
