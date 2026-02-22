@@ -1,26 +1,12 @@
-import { useState } from "react";
+import { login } from "../../services/supabase";
 
 
-export default function GithubConnectModal({ isOpen, onConnected, onClose }) {
-  const [selectedRepoFullName, setSelectedRepoFullName] = useState("");
+export default function GithubConnectModal({ isOpen }) {
 
-  const handleConnectGithub = () => {
-    // Intentionally left bare for teammate implementation.
+  const handleConnectGithub = async () => {
+    await login();
   };
 
-  const handleContinue = () => {
-    if (!selectedRepoFullName) {
-      return;
-    }
-
-    if (typeof onConnected === "function") {
-      onConnected({ installationId: "", repoFullName: selectedRepoFullName });
-    }
-
-    if (typeof onClose === "function") {
-      onClose();
-    }
-  };
 
   if (!isOpen) {
     return null;

@@ -5,6 +5,7 @@ import SectionCard from "./components/SectionCard";
 import GithubConnectModal from "./components/github/GithubConnectModal";
 import GeneratingOverlay from "./components/GeneratingOverlay";
 import GenerationSuccessOverlay from "./components/GenerationSuccessOverlay";
+import { getRepos, isLoggedIn, logout } from "./services/supabase";
 
 const STEP_SEQUENCE = [
   { id: 1, name: "Goals" },
@@ -60,6 +61,21 @@ export default function App() {
   const [selectedOwner, setSelectedOwner] = useState("");
   const [selectedRepo, setSelectedRepo] = useState("");
   const generationTimerRef = useRef(null);
+
+  useEffect( () => {
+    isLoggedIn().then((isLoggedIn) => {
+      if (isLoggedIn) {
+        getRepos().then((repos) => {
+          console.log(repos);
+          setOwnerRepositoryOptions(repos);
+        }).catch(console.warn("Failed To Populate Owner/Repos"));
+      } else {
+        setIsGithubModalOpen(true);
+        console.warn("Not logged In");
+      }
+    })
+  }, []);
+
 
   const isGoalsComplete = goals.some((goal) => isGoalValid(goal));
   const isConstraintsComplete = constraints.some((constraint) => isConstraintValid(constraint));
@@ -214,7 +230,10 @@ export default function App() {
     setSelectedRepo(repo);
   };
 
-  const handleGithubLogout = () => {};
+  const handleGithubLogout = () => {
+    logout();
+    setIsGithubModalOpen(true);
+  };
 
   const handleGeneratePlan = () => {
     if (isGenerateDisabled) {
@@ -288,7 +307,7 @@ export default function App() {
           {ownerRepositoryOptions === null ? (
             <button
               type="button"
-              onClick={() => setIsGithubModalOpen(true)}
+              onClick={() => setIsGithubModalOpen(true) }
               className="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-900 hover:bg-slate-100"
             >
               Open GitHub Modal
