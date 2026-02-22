@@ -37,6 +37,7 @@ function isConstraintValid(constraint) {
 }
 
 export default function App() {
+  const [projectTitle] = useState("Hackathon MVP");
   const [activeStepId, setActiveStepId] = useState(1);
   const [goals, setGoals] = useState([]);
   const [constraints, setConstraints] = useState([]);
@@ -183,6 +184,31 @@ export default function App() {
     setGuardrailsSelections((previous) => ({ ...previous, other: text }));
   };
 
+  const handleGeneratePlan = () => {
+    if (isGenerateDisabled) {
+      return;
+    }
+
+    const payload = {
+      projectTitle: projectTitle.trim(),
+      goals: goals.map((goal) => ({
+        title: goal.title.trim(),
+        success: goal.successCriteria.trim(),
+      })),
+      constraints: constraints.map((constraint) => constraint.text.trim()).filter(Boolean),
+      context: contextText.trim(),
+      guardrails: {
+        security: [...guardrailsSelections.security],
+        standards: [...guardrailsSelections.standards],
+        ethics: [...guardrailsSelections.ethics],
+        product_principles: [...guardrailsSelections.product],
+        other: guardrailsSelections.other.trim(),
+      },
+    };
+
+    console.log("RequestPayload:\n", JSON.stringify(payload, null, 2));
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
       <Header />
@@ -195,7 +221,7 @@ export default function App() {
             onSelectStep={handleSelectStep}
             onBack={handleBack}
             onNext={handleNext}
-            onGeneratePlan={() => {}}
+            onGeneratePlan={handleGeneratePlan}
             isBackDisabled={isBackDisabled}
             isNextDisabled={isNextDisabled}
             isGenerateDisabled={isGenerateDisabled}
