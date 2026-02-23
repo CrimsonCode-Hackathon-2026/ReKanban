@@ -1,6 +1,7 @@
 # Current Status Of Project
 - Hosting At https://rekanban.netlify.app/
 - Supabase used for backend currently paused (Google Gemini Key to access models force expired)
+- Use OAuth Apps for the organization removed from personal account must re-add client_id and Oauth key to supabase
 
 # React + Vite
 
