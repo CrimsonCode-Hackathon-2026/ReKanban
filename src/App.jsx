@@ -8,11 +8,11 @@ import GenerationSuccessOverlay from "./components/GenerationSuccessOverlay";
 import { generatedTasks, getRepos, isLoggedIn, logout } from "./services/supabase";
 
 const STEP_SEQUENCE = [
-  { id: 1, name: "Goals" },
-  { id: 2, name: "Constraints" },
-  { id: 3, name: "Context" },
-  { id: 4, name: "Guardrails" },
-  { id: 5, name: "Repository" },
+  { id: 1, name: "Repository" },
+  { id: 2, name: "Goals" },
+  { id: 3, name: "Constraints" },
+  { id: 4, name: "Context" },
+  { id: 5, name: "Guardrails" },
 ];
 
 const GUARDRAIL_ARRAY_KEYS = ["security", "standards", "ethics", "product"];
@@ -100,11 +100,11 @@ export default function App() {
 
   const steps = useMemo(() => {
     const completionByStepId = {
-      1: isGoalsComplete,
-      2: isConstraintsComplete,
-      3: isContextComplete,
-      4: isGuardrailsComplete,
-      5: isRepositoryComplete,
+      1: isRepositoryComplete,
+      2: isGoalsComplete,
+      3: isConstraintsComplete,
+      4: isContextComplete,
+      5: isGuardrailsComplete,
     };
 
     return STEP_SEQUENCE.map((step) => {
