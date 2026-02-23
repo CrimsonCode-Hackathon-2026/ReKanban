@@ -1,3 +1,7 @@
+# Current Status Of Project
+- Hosting At https://rekanban.netlify.app/
+- Supabase used for backend currently paused (Google Gemini Key to access models force expired)
+
 # React + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
