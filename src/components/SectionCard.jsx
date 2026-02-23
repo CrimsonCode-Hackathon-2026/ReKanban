@@ -6,39 +6,39 @@ import RepositorySelectionStep from "./RepositorySelectionStep";
 
 const STEP_META = {
   1: {
+    name: "Repository",
+    subtitle: "Choose the GitHub destination for generated issues.",
+    panelClasses: "border-emerald-200 bg-emerald-100/80",
+    labelClasses: "text-emerald-900",
+    chipClasses: "bg-white/80 text-emerald-800",
+  },
+  2: {
     name: "Goals",
     subtitle: "Define outcomes. Tasks will be generated from these goals.",
     panelClasses: "border-amber-200 bg-amber-100/80",
     labelClasses: "text-amber-900",
     chipClasses: "bg-white/80 text-amber-800",
   },
-  2: {
+  3: {
     name: "Constraints",
     subtitle: "Capture limits and boundaries for the generated plan.",
     panelClasses: "border-sky-200 bg-sky-100/80",
     labelClasses: "text-sky-900",
     chipClasses: "bg-white/80 text-sky-800",
   },
-  3: {
+  4: {
     name: "Context",
     subtitle: "Add background details so output matches your project reality.",
     panelClasses: "border-violet-200 bg-violet-100/80",
     labelClasses: "text-violet-900",
     chipClasses: "bg-white/80 text-violet-800",
   },
-  4: {
+  5: {
     name: "Guardrails",
     subtitle: "Define what to avoid and quality expectations.",
     panelClasses: "border-rose-200 bg-rose-100/80",
     labelClasses: "text-rose-900",
     chipClasses: "bg-white/80 text-rose-800",
-  },
-  5: {
-    name: "Repository",
-    subtitle: "Choose the GitHub destination for generated issues.",
-    panelClasses: "border-emerald-200 bg-emerald-100/80",
-    labelClasses: "text-emerald-900",
-    chipClasses: "bg-white/80 text-emerald-800",
   },
 };
 
@@ -93,34 +93,34 @@ export default function SectionCard({
       </div>
 
       {activeStepId === 1 ? (
-        <GoalsStep
-          goals={goals}
-          onAddGoal={onAddGoal}
-          onUpdateGoal={onUpdateGoal}
-          onDeleteGoal={onDeleteGoal}
-        />
-      ) : activeStepId === 2 ? (
-        <ConstraintsStep
-          constraints={constraints}
-          onAddConstraint={onAddConstraint}
-          onUpdateConstraint={onUpdateConstraint}
-          onDeleteConstraint={onDeleteConstraint}
-        />
-      ) : activeStepId === 3 ? (
-        <ContextStep value={contextText} onChange={onContextChange} />
-      ) : activeStepId === 4 ? (
-        <GuardrailsStep
-          value={guardrailsSelections}
-          onToggle={onToggleGuardrail}
-          onOtherChange={onUpdateGuardrailsOther}
-        />
-      ) : activeStepId === 5 ? (
         <RepositorySelectionStep
           ownerRepositoryOptions={ownerRepositoryOptions}
           selectedOwner={selectedOwner}
           selectedRepo={selectedRepo}
           onSelectOwner={onSelectOwner}
           onSelectRepo={onSelectRepo}
+        />
+      ) : activeStepId === 2 ? (
+        <GoalsStep
+          goals={goals}
+          onAddGoal={onAddGoal}
+          onUpdateGoal={onUpdateGoal}
+          onDeleteGoal={onDeleteGoal}
+        />
+      ) : activeStepId === 3 ? (
+        <ConstraintsStep
+          constraints={constraints}
+          onAddConstraint={onAddConstraint}
+          onUpdateConstraint={onUpdateConstraint}
+          onDeleteConstraint={onDeleteConstraint}
+        />
+      ) : activeStepId === 4 ? (
+        <ContextStep value={contextText} onChange={onContextChange} />
+      ) : activeStepId === 5 ? (
+        <GuardrailsStep
+          value={guardrailsSelections}
+          onToggle={onToggleGuardrail}
+          onOtherChange={onUpdateGuardrailsOther}
         />
       ) : (
         <PlaceholderStepContent title={currentStep.name} />

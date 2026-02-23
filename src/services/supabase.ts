@@ -1,56 +1,73 @@
-import { createClient } from "@supabase/supabase-js"
-
+import { createClient } from "@supabase/supabase-js";
 
 const SupabaseClient = createClient(
-    "https://chjcowhyqhqinkrbbsck.supabase.co",
-    "sb_publishable_9MlKCxVTT7Wic-9y-5W6Tw_cTKVcz5F"
+  "https://chjcowhyqhqinkrbbsck.supabase.co",
+  "sb_publishable_9MlKCxVTT7Wic-9y-5W6Tw_cTKVcz5F",
 );
 
 export async function login() {
-    await SupabaseClient.auth.signInWithOAuth({
+  await SupabaseClient.auth.signInWithOAuth({
     provider: "github",
-    options: { 
-        redirectTo: window.location.origin,
-        scopes: 'repo read:org'
-     },
-    });
+    options: {
+      redirectTo: window.location.origin,
+      scopes: "repo read:org",
+    },
+  });
 }
 
 export async function logout() {
-    await SupabaseClient.auth.signOut();
+  await SupabaseClient.auth.signOut();
 }
 
 type Repos = {
-    owner: string;
-    repos: string[];
+  owner: string;
+  repos: string[];
 }[];
 
-export async function isLoggedIn() : Promise<boolean> {
-    const { data, error: errorSession } = await SupabaseClient.auth.getSession();
-    return !( data.session == null || errorSession ); 
+export async function isLoggedIn(): Promise<boolean> {
+  const { data, error: errorSession } = await SupabaseClient.auth.getSession();
+  return !(data.session == null || errorSession);
 }
 
-export async function getRepos() : Promise<Repos> {
-    const { data, error: errorSession } = await SupabaseClient.auth.getSession();
-    if ( data.session == null || errorSession ) { throw new Error(errorSession?.message) }
-    const github_token = data.session.provider_token;
+export async function getRepos(): Promise<Repos> {
+  const { data, error: errorSession } = await SupabaseClient.auth.getSession();
+  if (data.session == null || errorSession) {
+    throw new Error(errorSession?.message);
+  }
+  const github_token = data.session.provider_token;
 
-    const { data: func_data, error: error } = await SupabaseClient.functions.invoke('retrieve-repos', { body: {github_token}  });
-    if ( error ) { throw new Error(error.message) }
+  const { data: func_data, error: error } =
+    await SupabaseClient.functions.invoke("retrieve-repos", {
+      body: { github_token },
+    });
+  if (error) {
+    throw new Error(error.message);
+  }
 
-    return func_data.list;
+  return func_data.list;
 }
 
 // returns issue link upon success
-export async function generatedTasks(owner: string, repo: string, payload : any) : Promise<string> {
-    const { data, error: errorSession } = await SupabaseClient.auth.getSession();
-    if ( data.session == null || errorSession ) { throw new Error(errorSession?.message) }
-    const github_token = data.session.provider_token;
+export async function generatedTasks(
+  owner: string,
+  repo: string,
+  payload: any,
+): Promise<string> {
+  const { data, error: errorSession } = await SupabaseClient.auth.getSession();
+  if (data.session == null || errorSession) {
+    throw new Error(errorSession?.message);
+  }
+  const github_token = data.session.provider_token;
 
-    const { data: func_data, error } = await SupabaseClient.functions.invoke('create-github-issues', {
-        body: { github_token, owner, repo, payload },
-    });
-    if ( error ) { throw new Error(error.message) }
+  const { data: func_data, error } = await SupabaseClient.functions.invoke(
+    "create-github-issues",
+    {
+      body: { github_token, owner, repo, payload },
+    },
+  );
+  if (error) {
+    throw new Error(error.message);
+  }
 
-    return func_data.issue_link;
+  return func_data.issue_link;
 }
