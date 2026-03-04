@@ -1,5 +1,7 @@
 # Current Status Of Project
-- Hosting At https://rekanban.netlify.app/
+- Hosting at: (currently backend is down to save rate limits) https://rekanban.netlify.app/
+- Awarded MLH's Best Use of Gemini API: https://devpost.com/software/rekanban
+- LinkedIn Post: [linkedin.com/posts/underhill-jack_hackathon-softwaredevelopment-geminiapi](https://www.linkedin.com/posts/underhill-jack_hackathon-softwaredevelopment-geminiapi-activity-7434331893640192000-G-ie?utm_source=social_share_send&utm_medium=member_desktop_web&rcm=ACoAAEs1SMkBe7WxupGNYk9QRkGvWehmJnp6pcA)
 - Supabase used for backend currently paused (Google Gemini Key to access models force expired)
 - Use OAuth Apps for the organization removed from personal account must re-add client_id and Oauth key to supabase
 
